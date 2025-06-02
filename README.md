@@ -7,7 +7,7 @@ You can find under requirements.txt all necessary libraries and their recommende
 
 To recreate the virtual environment: 
 
-pip install -r requirements.txt
+*pip install -r requirements.txt*
 
 
 ## Files Structure
