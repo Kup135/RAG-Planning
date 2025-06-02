@@ -2,8 +2,8 @@
 A system for extracting, structuring, and visualizing data from municipal planning document. Using proprietary APIs (Claude and GPT)
 
 ## Environment
-These notebooks work best with Python version 3.9.6\ 
-de
+These notebooks work best with Python version 3.9.6
+You can find under requirements.txt all necessary libraries and their recommended versions.
 
 
 ## Files Structure
