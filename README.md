@@ -5,6 +5,10 @@ A system for extracting, structuring, and visualizing data from municipal planni
 These notebooks work best with Python version 3.9.6
 You can find under requirements.txt all necessary libraries and their recommended versions.
 
+To recreate the virtual environment: 
+
+pip install -r requirements.txt
+
 
 ## Files Structure
 The PythonNotebooks folder contains the 3 notebooks to run manually the 3 stages of the system:
