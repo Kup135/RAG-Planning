@@ -1,6 +1,10 @@
 # RAG-Planning
 A system for extracting, structuring, and visualizing data from municipal planning document. Using proprietary APIs (Claude and GPT)
 
+## Environment
+These notebooks work best with Python version 3.9.6\
+
+
 ## Files Structure
 The PythonNotebooks folder contains the 3 notebooks to run manually the 3 stages of the system:
 
