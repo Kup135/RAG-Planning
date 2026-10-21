@@ -46,6 +46,7 @@ flowchart LR
 
 Evaluated with a manually labeled golden set (`Evaluation/ground_truth_retrieval.json`) and [RAGAS](https://docs.ragas.io/). Validated in workshops with 6 urban planners (5 from the Tel Aviv municipality).
 
+![Example visualization](Q567True.png)
 
 
 ## What I learned (failure analysis)
