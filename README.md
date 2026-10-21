@@ -1,38 +1,30 @@
 # RAG-Planning
-A system for extracting, structuring, and visualizing data from municipal planning document. Using proprietary APIs (Claude and GPT)
 
-## Environment
-These notebooks work best with Python version 3.9.6
-You can find under requirements.txt all necessary libraries and their recommended versions.
+A system for extracting, structuring, and visualizing data from municipal planning documents, built on LLM APIs (Claude and GPT).
 
-To recreate the virtual environment: 
-
-*pip install -r requirements.txt*
-
-
-## Files Structure
-The PythonNotebooks folder contains the 3 notebooks to run manually the 3 stages of the system:
-
-  (1) RAG - Embedding the original data (pdf planning instructions - הוראות - documents) using Voyage AI API, saving them to a local DB, and then using Claude (Sonnet-3.7) API to query them one by one. 
-  
-  (2) Structuring - Using GPT API to structure the generated answers from the RAG stage, into JSONs that can be queried (Boolean/Categorical data/Interger/Float). 
-  
-  (3) SemiFormal - Joining the strucutred data to the metadata (years in which the planning documents were created), using Claude API to produce code snippet for visualizing the data, and running them to produce interactive Plotly visualizations. 
-
-## DATA 
-Data to use the system include planning documents under local authority of Tel Aviv municipality. All planning documents can be accessed as open data through the governmental website of the planning authority: https://mavat.iplan.gov.il/
+**85% accuracy on 40 hand-labeled plans · all 144 Tel Aviv master plans processed in ~5 minutes (vs. ~6 workdays by hand) · validated with 6 urban planners**
 
 ## Pipeline
 
-```mermaid
-flowchart LR
-    A[144 Tel Aviv master plans<br/>PDF] --> B[Chunking +<br/>Voyage embeddings]
-    B --> C[(Vector DB)]
-    Q[Planner question<br/>+ glossary expansion] --> C
-    C --> D[Claude Sonnet 3.7<br/>answers per plan]
-    D --> E[GPT-4o<br/>typed JSON output]
-    E --> F[Claude-generated<br/>Plotly visualizations]
-```
+**1. Preprocessing**: clean the PDF, extract text, chunk by header, then by length.
+
+![Preprocessing](docs/01_preprocessing.png)
+
+**2. Hybrid retrieval**: embedding similarity averaged with exact matches from a planning-terms dictionary, so domain jargon isn't missed.
+
+![Hybrid retrieval](docs/02_retrieval.png)
+
+**3. Answer generation**: the top-k chunks and the query go to Claude, which returns an answer with its source.
+
+![Answer generation](docs/03_answer.png)
+
+**4. Structuring**: answers go to GPT-4o with a fixed prompt and JSON decoding, producing typed data per plan (boolean, categorical, integer, float).
+
+![Structuring](docs/04_structuring.png)
+
+**5. Visualization**: structured data is joined with plan metadata, Claude writes Plotly code, and the code runs.
+
+![Visualization](docs/05_visualization.png)
 
 ## Results
 
@@ -44,10 +36,13 @@ flowchart LR
 | Processing time, all 144 plans | **5 min 15 s** (vs. ~20 min per plan by hand, ~6 workdays total) |
 | RAGAS (LLM-as-judge, 80 samples) | Faithfulness 0.66 · Relevancy 0.58 · Correctness 0.52 |
 
-Evaluated with a manually labeled golden set (`Evaluation/ground_truth_retrieval.json`) and [RAGAS](https://docs.ragas.io/). Validated in workshops with 6 urban planners (5 from the Tel Aviv municipality).
+Evaluated with a manually labeled golden set (`PythonNotebooks/Evaluation/ground_truth_retrieval.json`) and [RAGAS](https://docs.ragas.io/). Validated in workshops with 6 urban planners (5 from the Tel Aviv municipality).
+
+![RAGAS scores by query type](docs/06_ragas_boxplot.png)
+
+Q5 (number of housing units) clusters at 0 where the source didn't state the value. The model answered anyway instead of abstaining, which is why explicit "not stated" handling is the first item in the failure analysis below.
 
 ![Example visualization](Q567True.png)
-
 
 ## What I learned (failure analysis)
 
@@ -60,3 +55,23 @@ Evaluated with a manually labeled golden set (`Evaluation/ground_truth_retrieval
 ## Next steps
 
 Answer provenance and citations, regression runs on the golden set for every model or prompt change, and support for scanned documents and GIS data.
+
+## Running it
+
+These notebooks work best with Python 3.9.6. All required libraries and their recommended versions are in `requirements.txt`:
+
+```
+pip install -r requirements.txt
+```
+
+API keys (Voyage AI, Anthropic, OpenAI) are read from a local `.env` file, which is not committed.
+
+The `PythonNotebooks` folder contains 3 notebooks, one per stage:
+
+1. **RAG.ipynb**: embeds the planning instructions documents (הוראות) with the Voyage AI API, saves them to a local vector DB, and queries each plan with Claude (Sonnet 3.7).
+2. **Structuring.ipynb**: uses the GPT API to turn the generated answers into queryable JSON (boolean / categorical / integer / float).
+3. **SemiFormal.ipynb**: joins the structured data with plan metadata (approval year), uses Claude to generate visualization code, and runs it to produce interactive Plotly charts.
+
+## Data
+
+Planning documents under the local authority of the Tel Aviv municipality. All are available as open data from the national planning authority: https://mavat.iplan.gov.il/
